@@ -191,13 +191,6 @@
         )
   )
 
-;Funcion que me da el punto a tomar disponible, que no este en la solucion
-(define (next_route solucion movs_posibles fallo)
-  (cond ( (null? movs_posibles) null )
-        ( (and (not (miembro (car movs_posibles) solucion)) (not (equal? (car movs_posibles) fallo))) (car movs_posibles) )
-        (else (next_route solucion (cdr movs_posibles) fallo) )
-        )
-  )
 
 ;Funcion para eliminar
 (define (delete_last lista)
@@ -221,19 +214,7 @@
        
 
 
-;Funcion de Prueba (manejo de fallos)
-(define (test pos max solucion contador fallo)
-  (cond ( (not(null? (next_route solucion (movsPosibles pos max) fallo))) (list fallo solucion))
-        (else (test (last(delete_last solucion)) max (delete_last solucion) (- contador 1) (last solucion)) )
-        )
-  )
 
-;Funcion de Prueba  (manejo sin fallos)
-(define (test2  pos max solucion contador fallo)
-  (cond ((null? (next_route solucion (movsPosibles pos max) fallo)) (list contador solucion))
-        (else (test2 (next_route solucion (movsPosibles pos max) fallo) max (append solucion (list(next_route solucion (movsPosibles pos max) fallo))) (+ contador 1) fallo ) )
-        )
-  )
 
 ;Funcion que inserta un fallo en la lista correspondiente
 (define (insert_fallo pos fallo error)
@@ -253,8 +234,8 @@
 
 ;Funcion auxiliar de test3 para el caso de fallo
 (define (test4  pos max solucion contador fallo)
-  (cond ((null? fallo) (aux_route pos max solucion contador fallo))
-        (else (test4 (next_routes solucion (movsPosibles pos max) (lista_fallos pos fallo)) max (append solucion (list(next_routes solucion (movsPosibles pos max) fallo))) (+ contador 1) fallo ) )
+  (cond ((null? fallo) (list pos solucion))
+        (else (test4 (next_routes solucion (movsPosibles pos max) (lista_fallos pos fallo)) max (append solucion (list(next_routes solucion (movsPosibles pos max) (lista_fallos pos fallo)))) (+ contador 1) fallo ) )
         )
   )
 
@@ -279,10 +260,10 @@
   (car lista))
                                     
 ;Funcion Principal(Backtracking)
-(define (route pos max)
+(define (PDC-Todas pos max)
   (aux_route pos max '(pos) 1 '()))
 
-;Funcion Auxiliar(Backtracking) (SE ENCICLA............. porque si vuelve al mismo fallo se jode, ahora se cae porque le llega null y le da una embolia y no sabe que hacer :c )
+;Funcion Auxiliar(Backtracking) 
 (define (aux_route pos max solucion contador fallo)
   (cond ((equal? contador (* max max)) solucion)
         ((and (null? (next_routes solucion (movsPosibles pos max) (lista_fallos pos fallo))) (not(equal? contador (* max max)))) (test3 pos max solucion contador fallo))
